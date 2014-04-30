@@ -5,4 +5,5 @@ Simple Python3 script to retrieve the network interface information in user frie
 **Installation:**
 
 `wget https://raw.githubusercontent.com/mahmoudadel2/ifinfo/master/ifinfo -O /bin/ifinfo`
+
 `chmod u+x /bin/ifinfo`
