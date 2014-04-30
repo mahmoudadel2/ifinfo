@@ -1,0 +1,109 @@
+#!/usr/bin/env python3
+__author__ = 'Mahmoud Adel <mahmoud.adel2@gmail.com>'
+__version__ = 0.1
+
+'''
+Simple Python3 script to retrieve the network interface information in user friendly output.
+'''
+import sys
+import os
+import subprocess
+import re
+
+class termcolors:
+    BLUE = '\033[94m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m'
+    END = '\033[0m'
+
+osver = tuple(os.uname())
+
+if "Linux" not in osver:
+    exit("OS not Supported")
+
+iface = []
+ip = {}
+mac = {}
+state = {}
+
+try:
+    inputiface = sys.argv[1]
+except IndexError:
+    inputiface = ''
+
+def getIfaces(nic):
+    ipr = subprocess.getoutput("ip addr show {}".format(nic))
+    iplist = ipr.splitlines()
+    for item in iplist:
+        try:
+            new = re.match(r'^[0-9]\:\ .*:', item).string.split(sep=":")
+        except AttributeError:
+            continue
+        iface.append(new[1])
+
+def getIps(nic):
+    ipr = subprocess.getoutput("ip addr show {}".format(nic))
+    iplist = []
+    for item in ipr.splitlines(keepends=True):
+        try:
+            ips = re.match(r'^.*inet.', item).string.split()
+        except AttributeError:
+            continue
+        iplist.append(ips[1])
+    return iplist
+
+def getMac(nic):
+    ipr = subprocess.getoutput("ip addr show {}".format(nic))
+    maclist = []
+    for item in ipr.splitlines(keepends=True):
+        try:
+            macs = re.match(r'^.*link/ether.', item).string.split()
+        except AttributeError:
+            continue
+        maclist.append(macs[1])
+    return maclist
+
+def getStatus(nic):
+    ipr = subprocess.getoutput("ip addr show {}".format(nic))
+    statuslist = []
+    for item in ipr.splitlines(keepends=True):
+        try:
+            status = re.match(r'^.*state.', item).string.split()
+        except AttributeError:
+            continue
+        statuslist.append(status[8])
+    return statuslist
+
+def updateData():
+    for i in iface:
+        ip[i] = getIps(i)
+    for i in iface:
+        mac[i] = getMac(i)
+    for i in iface:
+        state[i] = getStatus(i)
+
+def fancyOut():
+    for i in iface:
+        print("Interface:", termcolors.BLUE, i)
+        print(termcolors.END, end='')
+        print("Status: ", end='')
+        if state[i] == ['UP']:
+            print(termcolors.GREEN, end='')
+        elif state[i] == ['DOWN']:
+            print(termcolors.RED, end='')
+        elif state[i] == ['UNKNOWN']:
+            print(termcolors.YELLOW, end='')
+        print(str(state[i]).strip('[]'))
+        print(termcolors.END, end='')
+        print("MAC: ", termcolors.GREEN, str(mac[i]).strip('[]'))
+        print(termcolors.END, end='')
+        print("IP: ", termcolors.GREEN, str(ip[i]).strip('[]'))
+        print(termcolors.END)
+
+def main():
+    getIfaces(inputiface)
+    updateData()
+    fancyOut()
+
+if __name__ == '__main__': main()
