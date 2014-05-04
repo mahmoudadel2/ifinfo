@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 __author__ = 'Mahmoud Adel <mahmoud.adel2@gmail.com>'
-__version__ = 0.1
+__version__ = 0.2
 
 '''
 Simple Python3 script to retrieve the network interface information in user friendly output.
@@ -9,6 +9,7 @@ import sys
 import os
 import subprocess
 import re
+import argparse
 
 class termcolors:
     BLUE = '\033[94m'
@@ -21,6 +22,11 @@ osver = tuple(os.uname())
 
 if "Linux" not in osver:
     exit("OS not Supported")
+
+parser = argparse.ArgumentParser(prog='ifinfo', usage='ifinfo <Interface>')
+if '-h' in sys.argv or '--help' in sys.argv:
+    parser.print_help()
+    exit()
 
 iface = []
 ip = {}
