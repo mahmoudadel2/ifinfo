@@ -5,11 +5,28 @@ __version__ = 0.2
 '''
 Simple Python3 script to retrieve the network interface information in user friendly output.
 '''
-import sys
+
 import os
+import sys
+import argparse
+
+def checkOS():
+    uname = os.uname()
+    if uname.sysname != 'Linux':
+        exit("OS not Supported!")
+
+checkOS()
+
+def checkArgs():
+    parser = argparse.ArgumentParser(prog='ifinfo', usage='ifinfo <Interface>')
+    if '-h' in sys.argv or '--help' in sys.argv:
+        parser.print_help()
+        exit()
+
+checkArgs()
+
 import subprocess
 import re
-import argparse
 
 class termcolors:
     BLUE = '\033[94m'
@@ -17,16 +34,6 @@ class termcolors:
     YELLOW = '\033[93m'
     RED = '\033[91m'
     END = '\033[0m'
-
-osver = tuple(os.uname())
-
-if "Linux" not in osver:
-    exit("OS not Supported")
-
-parser = argparse.ArgumentParser(prog='ifinfo', usage='ifinfo <Interface>')
-if '-h' in sys.argv or '--help' in sys.argv:
-    parser.print_help()
-    exit()
 
 iface = []
 ip = {}
