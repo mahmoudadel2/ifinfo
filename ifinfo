@@ -35,10 +35,10 @@ class termcolors:
     RED = '\033[91m'
     END = '\033[0m'
 
-iface = []
-ip = {}
-mac = {}
-state = {}
+iface = list()
+ip = dict()
+mac = dict()
+state = dict()
 
 try:
     inputiface = sys.argv[1]
